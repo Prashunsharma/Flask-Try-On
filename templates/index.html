@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Fitting Room</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input {
+            padding: 10px;
+            width: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        iframe {
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>Virtual Fitting Room</h1>
+
+    <form id="dimensionsForm">
+        <label for="shoulder_width">Shoulder Width (cm):</label>
+        <input type="number" id="shoulder_width" name="shoulder_width" required>
+
+        <label for="torso_height">Torso Height (cm):</label>
+        <input type="number" id="torso_height" name="torso_height" required>
+
+        <button type="submit">Process Shirts</button>
+    </form>
+
+    <h2>Live Virtual Fitting</h2>
+    <iframe src="/virtual_fitting" width="960" height="720"></iframe>
+
+    <h2>Controls</h2>
+    <button onclick="changeShirt('next')">Next Shirt</button>
+    <button onclick="changeShirt('previous')">Previous Shirt</button>
+    <br>
+    <button onclick="adjustPosition('w')">Move Up</button>
+    <button onclick="adjustPosition('s')">Move Down</button>
+    <button onclick="adjustPosition('a')">Move Left</button>
+    <button onclick="adjustPosition('d')">Move Right</button>
+
+    <script>
+        document.getElementById('dimensionsForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const shoulderWidth = document.getElementById('shoulder_width').value;
+            const torsoHeight = document.getElementById('torso_height').value;
+
+            const response = await fetch('/process_shirts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
+                    shoulder_width: shoulderWidth,
+                    torso_height: torsoHeight
+                })
+            });
+
+            const result = await response.json();
+            alert(result.message);
+        });
+
+        async function changeShirt(direction) {
+            const endpoint = direction === 'next' ? '/next_shirt' : '/previous_shirt';
+            const response = await fetch(endpoint);
+            const result = await response.json();
+            alert(result.message);
+        }
+
+        async function adjustPosition(direction) {
+            const response = await fetch('/adjust_position', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ direction })
+            });
+
+            const result = await response.json();
+            console.log(result);
+        }
+    </script>
+</body>
+</html>
