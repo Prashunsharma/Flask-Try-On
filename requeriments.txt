@@ -1,0 +1,5 @@
+opencv-contrib-python==4.10.0.82
+opencv-python==4.10.0.84
+opencv-python-headless==4.10.0.84 
+cvzone==1.6.1
+Flask==3.0.3
